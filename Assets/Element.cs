@@ -25,6 +25,7 @@ public class Element : MonoBehaviour, IObserver<GameObject>
     protected Vector3 offScreenPosition;
     public float screenTransitionTime = 0.05f;
     public Ease screenTransitionEasing = Ease.OutExpo;
+    public Ease offScreenTransitionEasing = Ease.InExpo;
     protected StateMachine<ScreenState> screenStateMachine;
     protected MotionHandle transitionMotionHandle;
     public bool hasDelay;
@@ -145,7 +146,7 @@ public class Element : MonoBehaviour, IObserver<GameObject>
     protected virtual void TransitionToOffScreen_OnEnter(StateBase<ScreenState> state)
     {
         transitionMotionHandle = LMotion.Create(rectTransform.localPosition, offScreenPosition, screenTransitionTime)
-            .WithEase(screenTransitionEasing)
+            .WithEase(offScreenTransitionEasing)
             .WithOnComplete(() => screenStateMachine.RequestStateChange(ScreenState.OffScreen))
             .Bind(x => rectTransform.localPosition = x);
     }

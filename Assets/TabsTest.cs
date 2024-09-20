@@ -15,7 +15,16 @@ public class TabsTest : MonoBehaviour
         {
             foreach(Element e in elements)
             {
-                e.RequestStateChange(Element.ScreenState.TransitionToOffScreen);
+                if(e.screenState == Element.ScreenState.OnScreen)
+                    e.RequestStateChange(Element.ScreenState.TransitionToOffScreen);
+            }
+        }
+        else
+        {
+            foreach (Element e in elements)
+            {
+                if (e.screenState == Element.ScreenState.OffScreen)
+                    e.RequestStateChange(Element.ScreenState.TransitionToOnScreen);
             }
         }
     }
