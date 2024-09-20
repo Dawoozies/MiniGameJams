@@ -20,10 +20,11 @@ public class Element : MonoBehaviour, IObserver<GameObject>
     [Disable] public ScreenState screenState;
     public ScreenState startingScreenState;
     public OffScreenSide offScreenSide;
+
     protected Vector3 onScreenPosition;
     protected Vector3 offScreenPosition;
-    public float onScreenTransitionTime;
-    public Ease onScreenTransitionEasing;
+    public float screenTransitionTime = 0.05f;
+    public Ease screenTransitionEasing = Ease.OutExpo;
     protected StateMachine<ScreenState> screenStateMachine;
     protected MotionHandle transitionMotionHandle;
     public bool hasDelay;
@@ -118,15 +119,15 @@ public class Element : MonoBehaviour, IObserver<GameObject>
         //start transition
         if(!hasDelay)
         {
-            transitionMotionHandle = LMotion.Create(offScreenPosition, onScreenPosition, onScreenTransitionTime)
-                .WithEase(onScreenTransitionEasing)
+            transitionMotionHandle = LMotion.Create(offScreenPosition, onScreenPosition, screenTransitionTime)
+                .WithEase(screenTransitionEasing)
                 .WithOnComplete(() => screenStateMachine.RequestStateChange(ScreenState.OnScreen))
                 .Bind(x => rectTransform.localPosition = x);
         }
         else
         {
-            transitionMotionHandle = LMotion.Create(offScreenPosition, onScreenPosition, onScreenTransitionTime)
-                .WithEase(onScreenTransitionEasing)
+            transitionMotionHandle = LMotion.Create(offScreenPosition, onScreenPosition, screenTransitionTime)
+                .WithEase(screenTransitionEasing)
                 .WithOnComplete(() => screenStateMachine.RequestStateChange(ScreenState.OnScreen))
                 .WithDelay(StaticData.ins.GetDelay(rectTransform.localPosition, offScreenSide))
                 .Bind(x => rectTransform.localPosition = x);
@@ -134,8 +135,6 @@ public class Element : MonoBehaviour, IObserver<GameObject>
     }
     protected virtual void TransitionToOnScreen_OnLogic(StateBase<ScreenState> state)
     {
-        //update transition
-        screenStateMachine.RequestStateChange(ScreenState.OnScreen);
     }
     protected virtual void OnScreen_OnEnter(StateBase<ScreenState> state)
     {
@@ -145,8 +144,16 @@ public class Element : MonoBehaviour, IObserver<GameObject>
     }
     protected virtual void TransitionToOffScreen_OnEnter(StateBase<ScreenState> state)
     {
+        transitionMotionHandle = LMotion.Create(rectTransform.localPosition, offScreenPosition, screenTransitionTime)
+            .WithEase(screenTransitionEasing)
+            .WithOnComplete(() => screenStateMachine.RequestStateChange(ScreenState.OffScreen))
+            .Bind(x => rectTransform.localPosition = x);
     }
     protected virtual void TransitionToOffScreen_OnLogic(StateBase<ScreenState> state)
     {
+    }
+    public virtual void RequestStateChange(ScreenState state)
+    {
+        screenStateMachine.RequestStateChange(state);
     }
 }

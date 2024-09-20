@@ -6,6 +6,17 @@ using UnityEngine;
 public class TabsTest : MonoBehaviour
 {
     public TextMeshProUGUI debugText;
-    public GameObject[] buttonElements;
-
+    public GameObject menuContent;
+    public List<Element> elements = new();
+    public bool offScreen;
+    private void Update()
+    {
+        if(offScreen)
+        {
+            foreach(Element e in elements)
+            {
+                e.RequestStateChange(Element.ScreenState.TransitionToOffScreen);
+            }
+        }
+    }
 }
